@@ -30,7 +30,7 @@ const titleStyle = {
 const inputContainerStyle = {
   backgroundColor: '#BDC3C7',
   borderRadius: '15px',
-  padding: '20px',
+  padding: '21px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
