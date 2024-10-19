@@ -20,6 +20,7 @@ const mainStyle = {
   height: '70vh',
   backgroundColor: '#242F94',
   color: 'white'
+  
 };
 
 const titleStyle = {
@@ -36,9 +37,9 @@ const inputContainerStyle = {
   backgroundColor: '#BDC3C7',
   borderRadius: '15px',
   padding: '20px',
-  width: '80%',
-  maxWidth: '600px',
-  height: '300px',
+  width: '100%',
+  maxWidth: '1000px',
+  height: '400px',
   flexDirection: 'column',  // Column layout so the button is below textarea
 };
 
