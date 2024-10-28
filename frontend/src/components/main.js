@@ -18,17 +18,18 @@ const mainStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   height: '70vh',
-  backgroundColor: '#242F94',
-  color: 'white'
+  backgroundColor: '#F4F1DE', 
+  color: '#333' 
 };
 
 const titleStyle = {
   fontSize: '28px',
-  marginBottom: '20px'
+  marginBottom: '20px',
+  color: '#333' 
 };
 
 const inputContainerStyle = {
-  backgroundColor: '#BDC3C7',
+  backgroundColor: '#D9D2C5', 
   borderRadius: '15px',
   padding: '20px',
   display: 'flex',
@@ -37,7 +38,8 @@ const inputContainerStyle = {
   justifyContent: 'flex-end',
   width: '80%',
   maxWidth: '600px',
-  height: '200px'
+  height: '200px',
+  color: '#333'
 };
 
 const textareaStyle = {
@@ -46,18 +48,20 @@ const textareaStyle = {
   borderRadius: '10px',
   padding: '15px',
   fontSize: '16px',
-  border: 'none',
-  marginBottom: '20px'
+  border: '1px solid #D3CBC2', 
+  marginBottom: '20px',
+  color: '#333'
 };
 
 const buttonStyle = {
   padding: '10px 20px',
-  backgroundColor: '#E67E22',
+  backgroundColor: '#F28A2E', 
   color: 'white',
   border: 'none',
   borderRadius: '5px',
   fontSize: '16px',
-  cursor: 'pointer'
+  cursor: 'pointer',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' 
 };
 
 export default MainSection;
