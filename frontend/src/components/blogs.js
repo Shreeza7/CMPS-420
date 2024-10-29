@@ -17,11 +17,11 @@ const blogPosts = [
     id: 3,
     title: "Tips for Effective Blogging",
     excerpt: "Learn how to engage your audience and create compelling content that drives traffic to your blog.",
-    link: "/blogs/tips-for-effective-blogging",
+    link: "/blogs/tips-for-effective-bloggings",
   },
 ];
 
-const Blogs = () => {
+const BlogPage = () => {
   return (
     <div style={pageStyle}>
       <h1 style={headerStyle}>Blogs</h1>
@@ -79,4 +79,4 @@ const readMoreStyle = {
   fontWeight: 'bold',
 };
 
-export default Blogs;
+export default BlogPage;
