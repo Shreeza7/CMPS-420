@@ -1,20 +1,8 @@
-/*import React from 'react';
+import React from 'react';
 
 const LoginPage = () => {
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.logo}>Blog Writer</h1>
-        <nav>
-          <ul style={styles.navList}>
-            <li style={styles.navItem}>Home</li>
-            <li style={styles.navItem}>Blogs</li>
-            <li style={styles.navItem}>About</li>
-            <li style={styles.navItem}>Login</li>
-          </ul>
-        </nav>
-      </header>
-
       <main style={styles.main}>
         <div style={styles.formContainer}>
           <h2 style={styles.formTitle}>Login</h2>
@@ -53,10 +41,6 @@ const LoginPage = () => {
           </div>
         </div>
       </main>
-
-      <footer style={styles.footer}>
-        <p>© 2024 Blog Writer. All Rights Reserved.</p>
-      </footer>
     </div>
   );
 };
@@ -67,35 +51,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#F4F1DE',
-  },
-
-  header: {
-    width: '100%',
-    backgroundColor: '#998E7B',
-    padding: '1rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  logo: {
-    color: 'white',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-
-  navList: {
-    display: 'flex',
-    gap: '1.5rem',
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-
-  navItem: {
-    color: 'white',
-    cursor: 'pointer',
   },
 
   main: {
@@ -132,6 +87,7 @@ const styles = {
   inputGroup: {
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     gap: '0.25rem',
   },
 
@@ -189,13 +145,6 @@ const styles = {
       textDecoration: 'underline',
     },
   },
-
-  footer: {
-    backgroundColor: '#998E7B',
-    color: 'white',
-    textAlign: 'center',
-    padding: '1rem',
-  },
 };
 
-export default LoginPage;*/
+export default LoginPage;

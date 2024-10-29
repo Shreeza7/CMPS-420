@@ -1,4 +1,4 @@
-/*import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 
 const SignUpPage = () => {
@@ -15,19 +15,6 @@ const SignUpPage = () => {
 
   return (
     <div style={styles.container}>
-      <nav style={styles.nav}>
-        <div style={styles.navContent}>
-          <h1 style={styles.logo}>Blog Writer</h1>
-          <div style={styles.navLinks}>
-            <a href="#" style={styles.navLink}>Home</a>
-            <a href="#" style={styles.navLink}>Blogs</a>
-            <a href="#" style={styles.navLink}>My Blogs</a>
-            <a href="#" style={styles.navLink}>About</a>
-            <a href="#" style={styles.navLink}>Login</a>
-          </div>
-        </div>
-      </nav>
-
       <main style={styles.main}>
         <div style={styles.formCard}>
           <h2 style={styles.formTitle}>Sign Up</h2>
@@ -78,10 +65,6 @@ const SignUpPage = () => {
           </div>
         </div>
       </main>
-
-      <footer style={styles.footer}>
-        <p>© 2024 Blog Writer. All Rights Reserved.</p>
-      </footer>
     </div>
   );
 };
@@ -95,33 +78,6 @@ const styles = {
     margin: 0,
     padding: 0,
     fontFamily: 'Arial, sans-serif',
-  },
-  nav: {
-    backgroundColor: '#8b7355', 
-    padding: '1rem',
-  },
-  navContent: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: 'white',
-    margin: 0,
-  },
-  navLinks: {
-    display: 'flex',
-    gap: '2rem',
-  },
-  navLink: {
-    color: 'white',
-    textDecoration: 'none',
-    fontSize: '1rem',
-    fontWeight: '500',
   },
   main: {
     flex: 1,
@@ -196,12 +152,6 @@ const styles = {
     textDecoration: 'none',
     fontWeight: '500',
   },
-  footer: {
-    backgroundColor: '#8b7355', 
-    color: 'white',
-    padding: '1rem',
-    textAlign: 'center',
-  },
 };
 
-export default SignUpPage;*/
+export default SignUpPage;
