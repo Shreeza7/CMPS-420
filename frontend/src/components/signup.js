@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 
 const SignUpPage = () => {
@@ -15,7 +15,6 @@ const SignUpPage = () => {
 
   return (
     <div style={styles.container}>
-      {/* Navigation */}
       <nav style={styles.nav}>
         <div style={styles.navContent}>
           <h1 style={styles.logo}>Blog Writer</h1>
@@ -29,7 +28,6 @@ const SignUpPage = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main style={styles.main}>
         <div style={styles.formCard}>
           <h2 style={styles.formTitle}>Sign Up</h2>
@@ -81,7 +79,6 @@ const SignUpPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <p>© 2024 Blog Writer. All Rights Reserved.</p>
       </footer>
@@ -94,13 +91,13 @@ const styles = {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#f7f3e3', // Cream background
+    backgroundColor: '#f7f3e3',
     margin: 0,
     padding: 0,
     fontFamily: 'Arial, sans-serif',
   },
   nav: {
-    backgroundColor: '#8b7355', // Brown navigation
+    backgroundColor: '#8b7355', 
     padding: '1rem',
   },
   navContent: {
@@ -134,7 +131,7 @@ const styles = {
     padding: '2rem',
   },
   formCard: {
-    backgroundColor: '#e6e1d3', // Light beige container
+    backgroundColor: '#e6e1d3', 
     padding: '2.5rem',
     borderRadius: '15px',
     width: '100%',
@@ -171,12 +168,12 @@ const styles = {
     right: '0.75rem',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: '#8b7355', // Brown icon color
+    color: '#8b7355', 
   },
   button: {
     width: '100%',
     padding: '0.875rem',
-    backgroundColor: '#e67e22', // Orange button
+    backgroundColor: '#e67e22', 
     color: 'white',
     border: 'none',
     borderRadius: '8px',
@@ -195,16 +192,16 @@ const styles = {
     margin: '0.5rem 0',
   },
   footerLink: {
-    color: '#8b7355', // Brown link color
+    color: '#8b7355', 
     textDecoration: 'none',
     fontWeight: '500',
   },
   footer: {
-    backgroundColor: '#8b7355', // Brown footer
+    backgroundColor: '#8b7355', 
     color: 'white',
     padding: '1rem',
     textAlign: 'center',
   },
 };
 
-export default SignUpPage;
+export default SignUpPage;*/

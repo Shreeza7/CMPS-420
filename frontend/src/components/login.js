@@ -1,9 +1,8 @@
-import React from 'react';
+/*import React from 'react';
 
 const LoginPage = () => {
   return (
     <div style={styles.container}>
-      {/* Header */}
       <header style={styles.header}>
         <h1 style={styles.logo}>Blog Writer</h1>
         <nav>
@@ -16,7 +15,6 @@ const LoginPage = () => {
         </nav>
       </header>
 
-      {/* Main Content */}
       <main style={styles.main}>
         <div style={styles.formContainer}>
           <h2 style={styles.formTitle}>Login</h2>
@@ -56,7 +54,6 @@ const LoginPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <p>© 2024 Blog Writer. All Rights Reserved.</p>
       </footer>
@@ -201,4 +198,4 @@ const styles = {
   },
 };
 
-export default LoginPage;
+export default LoginPage;*/
