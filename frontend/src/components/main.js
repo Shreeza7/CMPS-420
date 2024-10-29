@@ -18,29 +18,32 @@ const mainStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   height: '70vh',
-  backgroundColor: '#242F94',
-  color: 'white'
-  
+
+  backgroundColor: '#F4F1DE', 
+  color: '#333' 
 };
 
 const titleStyle = {
   fontSize: '28px',
-  marginBottom: '20px'
+  marginBottom: '20px',
+  color: '#333' 
 };
 
 // Flexbox container to align the textarea and button horizontally
 const inputContainerStyle = {
-  display: 'flex',
-  alignItems: 'center',  // Vertically align items
-  justifyContent: 'flex-end',  // Align items to the bottom inside the box
-  gap: '10px',  // Add space between textarea and button
-  backgroundColor: '#BDC3C7',
+
+  backgroundColor: '#D9D2C5', 
   borderRadius: '15px',
   padding: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
   width: '100%',
-  maxWidth: '1000px',
+  maxWidth: '600px',
   height: '400px',
-  flexDirection: 'column',  // Column layout so the button is below textarea
+  color: '#333'
+
 };
 
 const textareaStyle = {
@@ -49,20 +52,22 @@ const textareaStyle = {
   borderRadius: '10px',
   padding: '15px',
   fontSize: '16px',
-  border: 'none',
-  marginBottom: '10px',  // Space between the textarea and button
+  border: '1px solid #D3CBC2', 
+  marginBottom: '20px',
+  color: '#333'
+
 };
 
 const buttonStyle = {
   padding: '10px 20px',
-  backgroundColor: '#E67E22',
+  backgroundColor: '#F28A2E', 
   color: 'white',
   border: 'none',
   borderRadius: '5px',
   fontSize: '16px',
   cursor: 'pointer',
-  height: 'fit-content',
-  alignSelf: 'center'  // Center align the button horizontally
+
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' 
 };
 
 export default MainSection;

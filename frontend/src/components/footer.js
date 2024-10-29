@@ -3,19 +3,36 @@ import React from 'react';
 const Footer = () => {
   return (
     <footer style={footerStyle}>
-      <p>&copy; 2024 Blog Writer. All Rights Reserved.</p>
+      <p style={footerTextStyle}>&copy; 2024 Blog Writer. All Rights Reserved.</p>
     </footer>
   );
 };
 
 const footerStyle = {
-  textAlign: 'center',
-  padding: '10px',
-  backgroundColor: '#192169',
-  color: 'white',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '10px 20px',
+  backgroundColor: '#8A7967',
+  color: '#F4F1DE',
   position: 'relative',
   bottom: 0,
-  width: '100%'
+  maxWidth: '100%', 
+  overflow: 'hidden', 
+  textAlign: 'center',
+};
+
+const footerTextStyle = {
+  fontSize: '16px',
+  margin: 0,
+};
+
+footerStyle['@media (max-width: 600px)'] = {
+  padding: '15px 10px',
+};
+
+footerTextStyle['@media (max-width: 600px)'] = {
+  fontSize: '14px',
 };
 
 export default Footer;
