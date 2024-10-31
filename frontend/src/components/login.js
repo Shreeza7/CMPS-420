@@ -9,7 +9,7 @@ const LoginPage = () => {
           
           <div style={styles.formFields}>
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Email</label>
+              <label style={styles.label} >Email</label>
               <input 
                 type="email" 
                 style={styles.input}
@@ -46,19 +46,13 @@ const LoginPage = () => {
 };
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#F4F1DE',
-  },
-
   main: {
     flex: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '2rem',
+  
   },
 
   formContainer: {
@@ -66,7 +60,7 @@ const styles = {
     borderRadius: '0.5rem',
     padding: '2rem',
     width: '100%',
-    maxWidth: '400px',
+    maxWidth: '350px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
 
@@ -95,6 +89,7 @@ const styles = {
     fontSize: '0.875rem',
     fontWeight: '500',
     color: '#4B5563',
+    
   },
 
   input: {

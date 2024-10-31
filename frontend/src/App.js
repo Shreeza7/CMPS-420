@@ -7,18 +7,20 @@ import BlogPage from './components/blogs';
 import LoginPage from './components/login';
 import Footer from './components/footer';
 import SignUpPage from './components/signup';
+import AboutPage from './components/about';
 
 const App = () => {
   return (
-    <div style={styles.container}> {/* Flex container to keep footer at the bottom */}
+    <div style={styles.container}> 
       <Router>
         <Header />
-        <div style={styles.content}> {/* Content area that expands to fill space */}
+        <div style={styles.content}> 
           <Routes>
             <Route path="/" element={<MainSection />} />
             <Route path="/blogs" element={<BlogPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/about" element={<AboutPage />} />
           </Routes>
         </div>
         <Footer />
@@ -31,10 +33,10 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh', // Ensures the container takes up the full viewport height
-  },
+    minHeight: '100vh', 
+    },
   content: {
-    flex: 1, // Expands to fill remaining space to keep footer at the bottom
+    flex: 1,
   },
 };
 
