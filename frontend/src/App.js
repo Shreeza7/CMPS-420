@@ -2,12 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Header from './components/header';
-import MainSection from './components/main';
+import MainSection from './components/MainSection.tsx';
 import BlogPage from './components/blogs';
 import LoginPage from './components/login';
 import Footer from './components/footer';
 import SignUpPage from './components/signup';
 import AboutPage from './components/about';
+import MyBlogs from './components/MyBlogs.tsx';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/myblogs" element={<MyBlogs/>} />
           </Routes>
         </div>
         <Footer />
