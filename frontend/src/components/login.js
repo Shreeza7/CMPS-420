@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Mail, Lock } from 'lucide-react';
 
 const LoginPage = () => {
   return (
@@ -15,6 +17,7 @@ const LoginPage = () => {
                 style={styles.input}
                 placeholder="Enter your email"
               />
+              
             </div>
             
             <div style={styles.inputGroup}>
@@ -32,7 +35,7 @@ const LoginPage = () => {
             
             <div style={styles.links}>
               <p style={styles.linkText}>
-                Don't have an account? <a href="#" style={styles.link}>Sign up</a>
+                Don't have an account? <Link to="/signup" style={styles.link}>Sign up</Link>
               </p>
               <p style={styles.linkText}>
                 <a href="#" style={styles.link}>Forgot your password?</a>

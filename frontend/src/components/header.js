@@ -58,7 +58,7 @@ const headerStyle = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '10px 20px',
-  backgroundColor: '#8A7967', // Lightened color for header
+  backgroundColor: '#8A7967', 
   color: '#F4F1DE',
 };
 
@@ -81,7 +81,7 @@ const linkStyle = {
   textDecoration: 'none',
   fontSize: '16px',
   transition: 'color 0.3s',
-  padding: '10px 15px', // Add some padding for spacing
+  padding: '8px 12px',
   borderRadius: '5px',
 };
 
