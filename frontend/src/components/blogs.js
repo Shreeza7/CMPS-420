@@ -40,7 +40,6 @@ const BlogPage = () => {
 
 const pageStyle = {
   padding: '20px',
-  backgroundColor: '#F4F1DE', 
   color: '#333',
 };
 
