@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Together from 'together-ai';
 
 interface BlogPost {
   id: string;
@@ -8,9 +7,7 @@ interface BlogPost {
   date: string;
 }
 
-const together = new Together({ 
-  apiKey: "YOUR_API_KEY", //replace with your Together API key
-});
+const API_KEY = "c076e873355eeaf092c773dd003178f173821babc199db31584ba7dca7c26083";
 
 const MainSection: React.FC = () => {
   const [userInput, setUserInput] = useState<string>('');
@@ -18,39 +15,25 @@ const MainSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [blogTitle, setBlogTitle] = useState<string>('');
   const [showSaveForm, setShowSaveForm] = useState<boolean>(false);
+  const [isTextModalOpen, setTextModalOpen] = useState<boolean>(false);
+  const [isImageModalOpen, setImageModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
-  const formatBlogContent = (content: string) => {
-    const sections = content.split(/\n\n|\*\*/g);
-    return sections
-      .filter(section => section.trim().length > 0)
-      .map(section => section.trim())
-      .join('\n\n');
-  };
-
-  const saveBlogPost = () => {
-    if (!blogTitle.trim()) {
-      alert('Please enter a title for your blog post');
-      return;
-    }
-
-    const newPost: BlogPost = {
-      id: Date.now().toString(),
-      title: blogTitle,
-      content: blogContent,
-      date: new Date().toISOString()
-    };
-
-    // Get existing posts from localStorage
-    const existingPosts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-    
-    // Add new post
-    localStorage.setItem('blogPosts', JSON.stringify([...existingPosts, newPost]));
-    
-    // Reset form
-    setBlogTitle('');
+  const openTextModal = () => {
+    setTextModalOpen(true);
+    setBlogContent('');
     setShowSaveForm(false);
-    alert('Blog post saved successfully!');
+    setUserInput('');
+    setError('');
   };
+
+  const closeTextModal = () => {
+    setTextModalOpen(false);
+    setError('');
+  };
+
+  const openImageModal = () => setImageModalOpen(true);
+  const closeImageModal = () => setImageModalOpen(false);
 
   const generateBlogContent = async () => {
     if (!userInput.trim()) {
@@ -59,60 +42,149 @@ const MainSection: React.FC = () => {
     }
 
     setIsLoading(true);
+    setError('');
+    
     try {
-      const response = await together.chat.completions.create({
-        messages: [
-          {
-            "role": "system",
-            "content": "You are a blog writer who provides blog suggestions and writes blog posts. Format your response with clear headings and paragraphs. Use proper spacing between sections."
-          },
-          {
-            "role": "user",
-            "content": userInput
-          }
-        ],
-        model: "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo",
-        max_tokens: 1000,
-        temperature: 0.7,
-        top_p: 0.7,
-        top_k: 50,
-        repetition_penalty: 1,
-        stop: ["<|eot_id|>","<|eom_id|>"],
-        stream: false
+      console.log("Sending request with input:", userInput);
+      
+      const response = await fetch('https://api.together.xyz/v1/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo',
+          prompt: `Write a detailed and well-structured blog post about: ${userInput}\n\nBlog post:`,
+          max_tokens: 1000,
+          temperature: 0.7,
+          top_p: 0.7,
+          top_k: 50,
+          repetition_penalty: 1,
+        }),
       });
 
-      const content = response?.choices?.[0]?.message?.content;
-      setBlogContent(formatBlogContent(content || 'No content generated'));
-      setShowSaveForm(true);
+      console.log("Raw API response:", response);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("Parsed API response data:", data);
+
+      if (data.choices && data.choices[0] && data.choices[0].text) {
+        const generatedContent = data.choices[0].text.trim();
+        console.log("Generated content:", generatedContent);
+        setBlogContent(generatedContent);
+        setShowSaveForm(true);
+        setTextModalOpen(false);
+      } else {
+        console.error("Unexpected API response structure:", data);
+        throw new Error('Invalid API response structure');
+      }
     } catch (error) {
-      console.error("Error generating blog content:", error);
-      setBlogContent('An error occurred while generating the blog content.');
+      console.error("Full error details:", error);
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+      setBlogContent('');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const saveBlogPost = () => {
+    if (!blogTitle.trim()) {
+      alert('Please enter a title for your blog post');
+      return;
+    }
+
+    try {
+      const newPost: BlogPost = {
+        id: Date.now().toString(),
+        title: blogTitle,
+        content: blogContent,
+        date: new Date().toISOString(),
+      };
+
+      const existingPosts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+      localStorage.setItem('blogPosts', JSON.stringify([...existingPosts, newPost]));
+
+      setBlogTitle('');
+      setShowSaveForm(false);
+      alert('Blog post saved successfully!');
+    } catch (error) {
+      console.error("Error saving blog post:", error);
+      alert('Failed to save blog post. Please try again.');
     }
   };
 
   return (
     <main style={mainStyle}>
       <h2 style={titleStyle}>Welcome to AI Blog Writing!</h2>
-      <div style={inputContainerStyle}>
-        <textarea 
-          style={textareaStyle}
-          placeholder="Let's turn your ideas into words!"
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-        />
-        <button 
-          style={{
-            ...buttonStyle,
-            ...(isLoading ? { opacity: 0.7, cursor: 'not-allowed' } : {})
-          }}
-          onClick={generateBlogContent}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Generating...' : 'Generate'}
+      
+      <div style={optionsContainerStyle}>
+        <button style={buttonStyle} onClick={openTextModal}>
+          Generate Text
+        </button>
+        <button style={buttonStyle} onClick={openImageModal}>
+          Generate Image
         </button>
       </div>
+
+      {/* Text Generation Modal */}
+      {isTextModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalStyle}>
+            <h3 style={modalTitleStyle}>Generate Text</h3>
+            <textarea
+              style={textareaStyle}
+              placeholder="What would you like to write about?"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+            />
+            <div style={modalButtonsStyle}>
+              <button
+                style={{
+                  ...buttonStyle,
+                  ...(isLoading ? { opacity: 0.7, cursor: 'not-allowed' } : {}),
+                }}
+                onClick={generateBlogContent}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Generating...' : 'Generate'}
+              </button>
+              <button style={closeButtonStyle} onClick={closeTextModal}>
+                Close
+              </button>
+            </div>
+            {error && <div style={errorStyle}>{error}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Image Generation Modal */}
+      {isImageModalOpen && (
+        <div style={modalOverlayStyle}>
+          <div style={modalStyle}>
+            <h3 style={modalTitleStyle}>Generate Image</h3>
+            <input
+              type="text"
+              style={inputStyle}
+              placeholder="Describe the image you want to generate..."
+            />
+            <div style={modalButtonsStyle}>
+              <button style={buttonStyle}>Generate Image</button>
+              <button style={closeButtonStyle} onClick={closeImageModal}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Display generated blog content */}
       {blogContent && (
         <div style={resultStyle}>
           {showSaveForm && (
@@ -124,23 +196,16 @@ const MainSection: React.FC = () => {
                 onChange={(e) => setBlogTitle(e.target.value)}
                 style={titleInputStyle}
               />
-              <button 
-                onClick={saveBlogPost}
-                style={saveButtonStyle}
-              >
+              <button onClick={saveBlogPost} style={saveButtonStyle}>
                 Save Blog Post
               </button>
             </div>
           )}
           <div style={blogContentStyle}>
-            {blogContent.split('\n\n').map((paragraph, index) => (
-              <React.Fragment key={index}>
-                {paragraph.startsWith('*') ? (
-                  <h3 style={sectionHeaderStyle}>{paragraph.replace(/\*/g, '')}</h3>
-                ) : (
-                  <p style={paragraphStyle}>{paragraph}</p>
-                )}
-              </React.Fragment>
+            {blogContent.split('\n').map((paragraph, index) => (
+              <p key={index} style={paragraphStyle}>
+                {paragraph}
+              </p>
             ))}
           </div>
         </div>
@@ -149,7 +214,7 @@ const MainSection: React.FC = () => {
   );
 };
 
-// Existing styles...
+// Styles remain the same as in your current implementation
 const mainStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -166,29 +231,10 @@ const titleStyle: React.CSSProperties = {
   color: '#333',
 };
 
-const inputContainerStyle: React.CSSProperties = {
-  backgroundColor: '#D9D2C5',
-  borderRadius: '15px',
-  padding: '20px',
+const optionsContainerStyle: React.CSSProperties = {
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  width: '80%',
-  maxWidth: '600px',
-  height: '200px',
-};
-
-const textareaStyle: React.CSSProperties = {
-  width: '100%',
-  height: '80px',
-  borderRadius: '10px',
-  padding: '15px',
-  fontSize: '16px',
-  border: '1px solid #D3CBC2',
+  gap: '20px',
   marginBottom: '20px',
-  color: '#333',
-  resize: 'vertical',
 };
 
 const buttonStyle: React.CSSProperties = {
@@ -200,6 +246,92 @@ const buttonStyle: React.CSSProperties = {
   fontSize: '16px',
   cursor: 'pointer',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+};
+
+const modalOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1000,
+};
+
+const modalStyle: React.CSSProperties = {
+  backgroundColor: '#FFF',
+  padding: '20px',
+  borderRadius: '10px',
+  width: '90%',
+  maxWidth: '500px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+};
+
+const modalTitleStyle: React.CSSProperties = {
+  fontSize: '24px',
+  marginBottom: '20px',
+  color: '#333',
+  textAlign: 'center',
+};
+
+const modalButtonsStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '10px',
+  justifyContent: 'center',
+  marginTop: '15px',
+};
+
+const textareaStyle: React.CSSProperties = {
+  width: '100%',
+  height: '150px',
+  borderRadius: '5px',
+  padding: '10px',
+  fontSize: '16px',
+  border: '1px solid #D3CBC2',
+  marginBottom: '15px',
+  resize: 'vertical',
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px',
+  borderRadius: '5px',
+  border: '1px solid #D3CBC2',
+  fontSize: '16px',
+  marginBottom: '15px',
+};
+
+const errorStyle: React.CSSProperties = {
+  color: 'red',
+  marginTop: '10px',
+  textAlign: 'center',
+  fontSize: '14px',
+  padding: '10px',
+  backgroundColor: '#ffebee',
+  borderRadius: '4px',
+};
+
+const closeButtonStyle: React.CSSProperties = {
+  padding: '10px 20px',
+  backgroundColor: '#6c757d',
+  color: 'white',
+  border: 'none',
+  borderRadius: '5px',
+  fontSize: '16px',
+  cursor: 'pointer',
+};
+
+const resultStyle: React.CSSProperties = {
+  width: '80%',
+  maxWidth: '800px',
+  backgroundColor: 'white',
+  padding: '30px',
+  borderRadius: '10px',
+  marginTop: '20px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
 const saveFormStyle: React.CSSProperties = {
@@ -227,27 +359,9 @@ const saveButtonStyle: React.CSSProperties = {
   fontSize: '16px',
 };
 
-const resultStyle: React.CSSProperties = {
-  width: '80%',
-  maxWidth: '800px',
-  backgroundColor: 'white',
-  padding: '30px',
-  borderRadius: '10px',
-  marginTop: '20px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-};
-
 const blogContentStyle: React.CSSProperties = {
   lineHeight: '1.6',
   color: '#333',
-};
-
-const sectionHeaderStyle: React.CSSProperties = {
-  fontSize: '20px',
-  fontWeight: 'bold',
-  marginTop: '24px',
-  marginBottom: '16px',
-  color: '#222',
 };
 
 const paragraphStyle: React.CSSProperties = {
