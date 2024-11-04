@@ -9,7 +9,7 @@ interface BlogPost {
 }
 
 const together = new Together({ 
-  apiKey: "YOUR_API_KEY", //replace with your Together API key
+  apiKey: "c076e873355eeaf092c773dd003178f173821babc199db31584ba7dca7c26083", //replace with your Together API key
 });
 
 const MainSection: React.FC = () => {
