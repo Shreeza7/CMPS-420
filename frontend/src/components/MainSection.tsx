@@ -18,6 +18,9 @@ const MainSection: React.FC = () => {
   const [isTextModalOpen, setTextModalOpen] = useState<boolean>(false);
   const [isImageModalOpen, setImageModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [imagePrompt, setImagePrompt] = useState<string>('');
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string>('');
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
   const openTextModal = () => {
     setTextModalOpen(true);
@@ -32,8 +35,17 @@ const MainSection: React.FC = () => {
     setError('');
   };
 
-  const openImageModal = () => setImageModalOpen(true);
-  const closeImageModal = () => setImageModalOpen(false);
+  const openImageModal = () => {
+    setImageModalOpen(true);
+    setImagePrompt('');
+    setGeneratedImageUrl('');
+    setError('');
+  };
+
+  const closeImageModal = () => {
+    setImageModalOpen(false);
+    setError('');
+  };
 
   const generateBlogContent = async () => {
     if (!userInput.trim()) {
@@ -47,7 +59,7 @@ const MainSection: React.FC = () => {
     try {
       console.log("Sending request with input:", userInput);
       
-      const response = await fetch('https://api.together.xyz/v1/completions', {
+      const response = await fetch('https://api.together.xyz/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
@@ -55,16 +67,23 @@ const MainSection: React.FC = () => {
         },
         body: JSON.stringify({
           model: 'meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo',
-          prompt: `Write a detailed and well-structured blog post about: ${userInput}\n\nBlog post:`,
-          max_tokens: 1000,
+          messages: [
+            {
+              role: "system",
+              content: "You are a professional blog writer who creates well-structured, engaging blog posts."
+            },
+            {
+              role: "user",
+              content: `Write a detailed blog post about: ${userInput}`
+            }
+          ],
           temperature: 0.7,
           top_p: 0.7,
           top_k: 50,
           repetition_penalty: 1,
+          max_tokens: 1000
         }),
       });
-
-      console.log("Raw API response:", response);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -75,14 +94,13 @@ const MainSection: React.FC = () => {
       const data = await response.json();
       console.log("Parsed API response data:", data);
 
-      if (data.choices && data.choices[0] && data.choices[0].text) {
-        const generatedContent = data.choices[0].text.trim();
+      if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        const generatedContent = data.choices[0].message.content.trim();
         console.log("Generated content:", generatedContent);
         setBlogContent(generatedContent);
         setShowSaveForm(true);
         setTextModalOpen(false);
       } else {
-        console.error("Unexpected API response structure:", data);
         throw new Error('Invalid API response structure');
       }
     } catch (error) {
@@ -91,6 +109,75 @@ const MainSection: React.FC = () => {
       setBlogContent('');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateImage = async () => {
+    if (!imagePrompt.trim()) {
+      alert('Please enter an image description first!');
+      return;
+    }
+
+    setIsImageLoading(true);
+    setError('');
+
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        authorization: `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'black-forest-labs/FLUX.1-schnell-Free',
+        prompt: imagePrompt,
+        steps: 4,
+        n: 1,
+        height: 1024,
+        width: 1024,
+        response_format: "b64_json"  // Request base64 format
+      })
+    };
+
+    try {
+      console.log('Sending request with options:', JSON.stringify(options, null, 2));
+      const response = await fetch('https://api.together.xyz/v1/images/generations', options);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("Raw API response:", JSON.stringify(data, null, 2));
+
+      // Try different response formats
+      if (data.data?.[0]?.b64_json) {
+        setGeneratedImageUrl(`data:image/jpeg;base64,${data.data[0].b64_json}`);
+        setImageModalOpen(false);
+      } else if (data.data?.[0]?.url) {
+        // If we get a URL, try to proxy it
+        const proxyUrl = `https://api.together.xyz/imgproxy/${encodeURIComponent(data.data[0].url)}`;
+        setGeneratedImageUrl(proxyUrl);
+        setImageModalOpen(false);
+      } else {
+        console.error('Unexpected response structure:', JSON.stringify(data, null, 2));
+        throw new Error('Could not find image data in the response. Please check console for details.');
+      }
+    } catch (error) {
+      console.error("Image generation error:", error);
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          setError('Network error: Please check your internet connection and API key');
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError('An unexpected error occurred during image generation');
+      }
+    } finally {
+      setIsImageLoading(false);
     }
   };
 
@@ -169,23 +256,34 @@ const MainSection: React.FC = () => {
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
             <h3 style={modalTitleStyle}>Generate Image</h3>
-            <input
-              type="text"
-              style={inputStyle}
+            <textarea
+              style={textareaStyle}
               placeholder="Describe the image you want to generate..."
+              value={imagePrompt}
+              onChange={(e) => setImagePrompt(e.target.value)}
             />
             <div style={modalButtonsStyle}>
-              <button style={buttonStyle}>Generate Image</button>
+              <button
+                style={{
+                  ...buttonStyle,
+                  ...(isImageLoading ? { opacity: 0.7, cursor: 'not-allowed' } : {}),
+                }}
+                onClick={generateImage}
+                disabled={isImageLoading}
+              >
+                {isImageLoading ? 'Generating...' : 'Generate Image'}
+              </button>
               <button style={closeButtonStyle} onClick={closeImageModal}>
                 Close
               </button>
             </div>
+            {error && <div style={errorStyle}>{error}</div>}
           </div>
         </div>
       )}
 
-      {/* Display generated blog content */}
-      {blogContent && (
+      {/* Display generated content */}
+      {(blogContent || generatedImageUrl) && (
         <div style={resultStyle}>
           {showSaveForm && (
             <div style={saveFormStyle}>
@@ -201,20 +299,45 @@ const MainSection: React.FC = () => {
               </button>
             </div>
           )}
-          <div style={blogContentStyle}>
-            {blogContent.split('\n').map((paragraph, index) => (
-              <p key={index} style={paragraphStyle}>
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          {blogContent && (
+            <div style={blogContentStyle}>
+              {blogContent.split('\n').map((paragraph, index) => (
+                <p key={index} style={paragraphStyle}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          )}
+          {generatedImageUrl && (
+  <div style={imageContainerStyle}>
+    {isImageLoading && <div>Loading image...</div>}
+    <img 
+      src={generatedImageUrl} 
+      alt="Generated content"
+      style={generatedImageStyle}
+      crossOrigin="anonymous"
+      referrerPolicy="no-referrer"
+      onError={(e) => {
+        console.error('Image loading error:', e);
+        // Try fallback URL format if the first attempt fails
+        const target = e.target as HTMLImageElement;
+        if (!target.dataset.retried && target.src.includes('imgproxy')) {
+          target.dataset.retried = 'true';
+          target.src = target.src.replace('imgproxy/', '');
+        } else {
+          setError('Error loading the generated image. Please try again.');
+        }
+      }}
+    />
+  </div>
+)}
         </div>
       )}
     </main>
   );
 };
 
-// Styles remain the same as in your current implementation
+// Styles
 const mainStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -295,15 +418,6 @@ const textareaStyle: React.CSSProperties = {
   resize: 'vertical',
 };
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '5px',
-  border: '1px solid #D3CBC2',
-  fontSize: '16px',
-  marginBottom: '15px',
-};
-
 const errorStyle: React.CSSProperties = {
   color: 'red',
   marginTop: '10px',
@@ -368,6 +482,20 @@ const paragraphStyle: React.CSSProperties = {
   marginBottom: '16px',
   fontSize: '16px',
   lineHeight: '1.6',
+};
+
+const imageContainerStyle: React.CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: '20px',
+};
+
+const generatedImageStyle: React.CSSProperties = {
+  maxWidth: '100%',
+  height: 'auto',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
 export default MainSection;
