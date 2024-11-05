@@ -1,7 +1,9 @@
-import React from 'react';
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 const Header = () => {
+  const [hoveredLink, setHoveredLink] = useState(null);
+
   return (
     <header style={headerStyle}>
       <NavLink to="/" style={logoStyle}>Blog Writer</NavLink>
@@ -10,7 +12,13 @@ const Header = () => {
           <li>
             <NavLink 
               to="/" 
-              style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+              style={({ isActive }) =>
+                isActive
+                  ? activeLinkStyle
+                  : { ...linkStyle, ...(hoveredLink === 'home' ? linkHoverStyle : {}) }
+              }
+              onMouseEnter={() => setHoveredLink('home')}
+              onMouseLeave={() => setHoveredLink(null)}
             >
               Home
             </NavLink>
@@ -18,7 +26,13 @@ const Header = () => {
           <li>
             <NavLink 
               to="/blogs" 
-              style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+              style={({ isActive }) =>
+                isActive
+                  ? activeLinkStyle
+                  : { ...linkStyle, ...(hoveredLink === 'blogs' ? linkHoverStyle : {}) }
+              }
+              onMouseEnter={() => setHoveredLink('blogs')}
+              onMouseLeave={() => setHoveredLink(null)}
             >
               Blogs
             </NavLink>
@@ -26,7 +40,13 @@ const Header = () => {
           <li>
             <NavLink 
               to="/myblogs" 
-              style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+              style={({ isActive }) =>
+                isActive
+                  ? activeLinkStyle
+                  : { ...linkStyle, ...(hoveredLink === 'myblogs' ? linkHoverStyle : {}) }
+              }
+              onMouseEnter={() => setHoveredLink('myblogs')}
+              onMouseLeave={() => setHoveredLink(null)}
             >
               My Blogs
             </NavLink>
@@ -34,7 +54,13 @@ const Header = () => {
           <li>
             <NavLink 
               to="/about" 
-              style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+              style={({ isActive }) =>
+                isActive
+                  ? activeLinkStyle
+                  : { ...linkStyle, ...(hoveredLink === 'about' ? linkHoverStyle : {}) }
+              }
+              onMouseEnter={() => setHoveredLink('about')}
+              onMouseLeave={() => setHoveredLink(null)}
             >
               About
             </NavLink>
@@ -42,7 +68,13 @@ const Header = () => {
           <li>
             <NavLink 
               to="/login" 
-              style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+              style={({ isActive }) =>
+                isActive
+                  ? activeLinkStyle
+                  : { ...linkStyle, ...(hoveredLink === 'login' ? linkHoverStyle : {}) }
+              }
+              onMouseEnter={() => setHoveredLink('login')}
+              onMouseLeave={() => setHoveredLink(null)}
             >
               Login
             </NavLink>
@@ -95,6 +127,13 @@ const activeLinkStyle = {
   cursor: 'pointer',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
   textDecoration: 'none',
+};
+
+const linkHoverStyle = {
+  backgroundColor: '#FF5F1F',
+  color: 'white',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s, color 0.3s',
 };
 
 export default Header;
