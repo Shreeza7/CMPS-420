@@ -2,6 +2,7 @@ import React from "react";
 
 const blogPosts = [
   {
+    //test
     id: 1,
     title: "Understanding AI and Its Impact",
     excerpt:
