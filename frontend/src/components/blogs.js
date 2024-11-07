@@ -1,48 +1,69 @@
-import React from "react";
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "Understanding AI and Its Impact",
-    excerpt:
-      "AI is transforming industries and shaping the future. In this post, we explore the implications of AI in our daily lives.",
-    link: "/blogs/understanding-ai",
-  },
-  {
-    id: 2,
-    title: "The Future of Web Development",
-    excerpt:
-      "Web development is evolving rapidly. Discover the latest trends and technologies that are shaping the web.",
-    link: "/blogs/future-of-web-development",
-  },
-  {
-    id: 3,
-    title: "Tips for Effective Blogging",
-    excerpt:
-      "Learn how to engage your audience and create compelling content that drives traffic to your blog.",
-    link: "/blogs/tips-for-effective-bloggings",
-  },
-];
+import React, { useState, useEffect } from "react";
 
 const BlogPage = () => {
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  useEffect(() => {
+    // Fetching blog posts from local storage or an API
+    const savedBlogs = JSON.parse(localStorage.getItem("blogPosts") || "[]");
+    setBlogPosts(savedBlogs);
+  }, []);
+
+  const openModal = (post) => {
+    setSelectedPost(post);
+  };
+
+  const closeModal = () => {
+    setSelectedPost(null);
+  };
+
   return (
     <div style={pageStyle}>
       <h1 style={headerStyle}>Blogs</h1>
       <div style={blogListStyle}>
-        {blogPosts.map((post) => (
-          <div key={post.id} style={blogPostStyle}>
-            <h2 style={postTitleStyle}>{post.title}</h2>
-            <p style={postExcerptStyle}>{post.excerpt}</p>
-            <a href={post.link} style={readMoreStyle}>
-              Read More
-            </a>
-          </div>
-        ))}
+        {blogPosts.length > 0 ? (
+          blogPosts.map((post) => (
+            <div key={post.id} style={blogPostStyle}>
+              <h2 style={postTitleStyle}>{post.title}</h2>
+              <p style={postExcerptStyle}>
+                {post.content.length > 100
+                  ? `${post.content.substring(0, 100)}...`
+                  : post.content}
+              </p>
+              <button onClick={() => openModal(post)} style={readMoreStyle}>
+                Read More
+              </button>
+            </div>
+          ))
+        ) : (
+          <p style={emptyMessageStyle}>No blog posts available yet.</p>
+        )}
       </div>
+
+      {selectedPost && (
+        <div style={modalOverlayStyle} onClick={closeModal}>
+          <div
+            style={modalContentStyle}
+            onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside the modal
+          >
+            <button onClick={closeModal} style={closeButtonStyle}>
+              ×
+            </button>
+            <h2 style={modalTitleStyle}>{selectedPost.title}</h2>
+            <div style={modalBodyStyle}>
+              {selectedPost.content.split("\n").map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
+// Styles
 const pageStyle = {
   padding: "20px",
   color: "#333",
@@ -81,6 +102,66 @@ const readMoreStyle = {
   color: "#88BDBC",
   textDecoration: "none",
   fontWeight: "bold",
+  backgroundColor: "#000000",
+  border: "none",
+  padding: "10px 20px",
+  borderRadius: "5px",
+  cursor: "pointer",
+};
+
+const emptyMessageStyle = {
+  textAlign: "center",
+  color: "#777",
+  fontSize: "18px",
+  fontStyle: "italic",
+};
+
+const modalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const modalContentStyle = {
+  backgroundColor: "#FFF",
+  padding: "20px",
+  borderRadius: "10px",
+  width: "80%",
+  maxWidth: "600px",
+  maxHeight: "80vh", // Sets the maximum height
+  overflowY: "auto", // Adds vertical scroll if content overflows
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  position: "relative",
+};
+
+const modalTitleStyle = {
+  fontSize: "24px",
+  marginBottom: "20px",
+  color: "#333",
+};
+
+const modalBodyStyle = {
+  lineHeight: "1.6",
+  color: "#333",
+  marginBottom: "20px",
+};
+
+const closeButtonStyle = {
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  backgroundColor: "transparent",
+  border: "none",
+  fontSize: "24px",
+  cursor: "pointer",
+  color: "#ff4444",
 };
 
 export default BlogPage;
