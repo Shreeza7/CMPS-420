@@ -253,6 +253,30 @@ const MainSection: React.FC = () => {
     }
   };
 
+// Display the "Save Photo" button when an image is generated
+{generatedImageUrl && (
+  <div style={saveFormStyle}>
+    <input
+      type="text"
+      placeholder="Enter post title"
+      value={blogTitle}
+      onChange={(e) => setBlogTitle(e.target.value)}
+      style={titleInputStyle}
+    />
+    <button
+      onClick={saveBlogPost}
+      style={{
+        ...saveButtonStyle,
+        ...(hoveredSaveButton ? saveButtonHoverStyle : {}),
+      }}
+      onMouseEnter={() => setHoveredSaveButton(true)}
+      onMouseLeave={() => setHoveredSaveButton(false)}
+    >
+      Save Image Post
+    </button>
+  </div>
+)}
+
   return (
     <main style={mainStyle}>
       <h2 style={titleStyle}>Welcome to AI Blog Writing!</h2>
