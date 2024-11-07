@@ -64,6 +64,7 @@ const MainSection: React.FC = () => {
 
     setIsLoading(true);
     setError("");
+    setGeneratedImageUrl(""); // Clear the image when generating text
 
     try {
       console.log("Sending request with input:", userInput);
@@ -142,6 +143,7 @@ const MainSection: React.FC = () => {
 
     setIsImageLoading(true);
     setError("");
+    setBlogContent(""); // Clears the text when generating an image
 
     const options = {
       method: "POST",
