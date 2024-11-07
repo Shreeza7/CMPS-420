@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Header from './components/header';
-import MainSection from './components/MainSection.tsx';
+import MainSection from './components/MainSection';
 import BlogPage from './components/blogs';
 import LoginPage from './components/login';
 import Footer from './components/footer';
 import SignUpPage from './components/signup';
 import AboutPage from './components/about';
-import MyBlogs from './components/MyBlogs.tsx';
+import MyBlogs from './components/MyBlogs';
 
 const App = () => {
   return (
