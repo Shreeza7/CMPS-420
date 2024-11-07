@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 const BlogPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [isMinimized, setIsMinimized] = useState(false);
+
 
   useEffect(() => {
     // Fetching blog posts from local storage or an API
@@ -17,6 +19,10 @@ const BlogPage = () => {
   const closeModal = () => {
     setSelectedPost(null);
   };
+  const minimizeModal = () => {
+    setIsMinimized(!isMinimized);
+  };
+  
 
   return (
     <div style={pageStyle}>
@@ -50,6 +56,7 @@ const BlogPage = () => {
             <button onClick={closeModal} style={closeButtonStyle}>
               ×
             </button>
+            
             <h2 style={modalTitleStyle}>{selectedPost.title}</h2>
             <div style={modalBodyStyle}>
               {selectedPost.content.split("\n").map((paragraph, index) => (
