@@ -64,6 +64,7 @@ const MainSection: React.FC = () => {
 
     setIsLoading(true);
     setError("");
+    setGeneratedImageUrl(""); // Clear the image when generating text
 
     try {
       console.log("Sending request with input:", userInput);
@@ -142,6 +143,7 @@ const MainSection: React.FC = () => {
 
     setIsImageLoading(true);
     setError("");
+    setBlogContent(""); // Clears the text when generating an image
 
     const options = {
       method: "POST",
@@ -250,6 +252,30 @@ const MainSection: React.FC = () => {
       alert("Failed to save blog post. Please try again.");
     }
   };
+
+// Display the "Save Photo" button when an image is generated
+{generatedImageUrl && (
+  <div style={saveFormStyle}>
+    <input
+      type="text"
+      placeholder="Enter post title"
+      value={blogTitle}
+      onChange={(e) => setBlogTitle(e.target.value)}
+      style={titleInputStyle}
+    />
+    <button
+      onClick={saveBlogPost}
+      style={{
+        ...saveButtonStyle,
+        ...(hoveredSaveButton ? saveButtonHoverStyle : {}),
+      }}
+      onMouseEnter={() => setHoveredSaveButton(true)}
+      onMouseLeave={() => setHoveredSaveButton(false)}
+    >
+      Save Image Post
+    </button>
+  </div>
+)}
 
   return (
     <main style={mainStyle}>
