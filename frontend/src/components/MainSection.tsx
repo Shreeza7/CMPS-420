@@ -7,8 +7,7 @@ interface BlogPost {
   date: string;
 }
 
-const API_KEY =
-  "c076e873355eeaf092c773dd003178f173821babc199db31584ba7dca7c26083";
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const MainSection: React.FC = () => {
   const [userInput, setUserInput] = useState<string>("");

@@ -17,7 +17,7 @@ const LoginPage = () => {
                 style={styles.input}
                 placeholder="Enter your email"
               />
-              <Mail style={styles.inputIcon} size={20} /> {/* Mail icon added */}
+              <Mail style={styles.inputIcon} size={20} /> 
             </div>
             
             <div style={styles.inputGroup}>
@@ -27,7 +27,7 @@ const LoginPage = () => {
                 style={styles.input}
                 placeholder="Enter your password"
               />
-              <Lock style={styles.inputIcon} size={20} /> {/* Lock icon added */}
+              <Lock style={styles.inputIcon} size={20} /> 
             </div>
 
             <button style={styles.button}>
