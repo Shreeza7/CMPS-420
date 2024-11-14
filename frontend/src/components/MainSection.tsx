@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+
 interface BlogPost {
   id: string;
   title: string;
@@ -7,7 +8,9 @@ interface BlogPost {
   date: string;
 }
 
+
 const API_KEY = process.env.REACT_APP_API_KEY;
+
 
 const MainSection: React.FC = () => {
   const [userInput, setUserInput] = useState<string>("");
@@ -30,6 +33,7 @@ const MainSection: React.FC = () => {
   const [hoveredCloseImageButton, setHoveredCloseImageButton] = useState(false);
   const [hoveredSaveButton, setHoveredSaveButton] = useState(false);
 
+
   const openTextModal = () => {
     setTextModalOpen(true);
     setBlogContent("");
@@ -38,10 +42,12 @@ const MainSection: React.FC = () => {
     setError("");
   };
 
+
   const closeTextModal = () => {
     setTextModalOpen(false);
     setError("");
   };
+
 
   const openImageModal = () => {
     setImageModalOpen(true);
@@ -50,10 +56,12 @@ const MainSection: React.FC = () => {
     setError("");
   };
 
+
   const closeImageModal = () => {
     setImageModalOpen(false);
     setError("");
   };
+
 
   const generateBlogContent = async () => {
     if (!userInput.trim()) {
@@ -61,12 +69,15 @@ const MainSection: React.FC = () => {
       return;
     }
 
+
     setIsLoading(true);
     setError("");
     setGeneratedImageUrl(""); // Clear the image when generating text
 
+
     try {
       console.log("Sending request with input:", userInput);
+
 
       const response = await fetch(
         "https://api.together.xyz/v1/chat/completions",
@@ -98,6 +109,7 @@ const MainSection: React.FC = () => {
         }
       );
 
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Response:", errorText);
@@ -106,8 +118,10 @@ const MainSection: React.FC = () => {
         );
       }
 
+
       const data = await response.json();
       console.log("Parsed API response data:", data);
+
 
       if (
         data.choices &&
@@ -134,15 +148,18 @@ const MainSection: React.FC = () => {
     }
   };
 
+
   const generateImage = async () => {
     if (!imagePrompt.trim()) {
       alert("Please enter an image description first!");
       return;
     }
 
+
     setIsImageLoading(true);
     setError("");
     setBlogContent(""); // Clears the text when generating an image
+
 
     const options = {
       method: "POST",
@@ -162,6 +179,7 @@ const MainSection: React.FC = () => {
       }),
     };
 
+
     try {
       console.log(
         "Sending request with options:",
@@ -172,6 +190,7 @@ const MainSection: React.FC = () => {
         options
       );
 
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Response:", errorText);
@@ -180,8 +199,10 @@ const MainSection: React.FC = () => {
         );
       }
 
+
       const data = await response.json();
       console.log("Raw API response:", JSON.stringify(data, null, 2));
+
 
       // Try different response formats
       if (data.data?.[0]?.b64_json) {
@@ -221,11 +242,13 @@ const MainSection: React.FC = () => {
     }
   };
 
+
   const saveBlogPost = () => {
     if (!blogTitle.trim()) {
       alert("Please enter a title for your blog post");
       return;
     }
+
 
     try {
       const newPost: BlogPost = {
@@ -235,6 +258,7 @@ const MainSection: React.FC = () => {
         date: new Date().toISOString(),
       };
 
+
       const existingPosts = JSON.parse(
         localStorage.getItem("blogPosts") || "[]"
       );
@@ -242,6 +266,7 @@ const MainSection: React.FC = () => {
         "blogPosts",
         JSON.stringify([...existingPosts, newPost])
       );
+
 
       setBlogTitle("");
       setShowSaveForm(false);
@@ -251,6 +276,7 @@ const MainSection: React.FC = () => {
       alert("Failed to save blog post. Please try again.");
     }
   };
+
 
 // Display the "Save Photo" button when an image is generated
 {generatedImageUrl && (
@@ -276,9 +302,12 @@ const MainSection: React.FC = () => {
   </div>
 )}
 
+
   return (
     <main style={mainStyle}>
+    <div style={containerBoxStyle}>
       <h2 style={titleStyle}>Welcome to AI Blog Writing!</h2>
+
 
       <div style={optionsContainerStyle}>
         <button
@@ -297,7 +326,8 @@ const MainSection: React.FC = () => {
         >
           Generate Image
         </button>
-      </div>
+      </div></div>
+
 
       {/* Text Generation Modal */}
       {isTextModalOpen && (
@@ -340,6 +370,7 @@ const MainSection: React.FC = () => {
           </div>
         </div>
       )}
+
 
       {/* Image Generation Modal */}
       {isImageModalOpen && (
@@ -384,6 +415,7 @@ const MainSection: React.FC = () => {
           </div>
         </div>
       )}
+
 
       {/* Display generated content */}
       {(blogContent || generatedImageUrl) && (
@@ -453,6 +485,7 @@ const MainSection: React.FC = () => {
   );
 };
 
+
 // Styles
 const mainStyle: React.CSSProperties = {
   display: "flex",
@@ -464,17 +497,20 @@ const mainStyle: React.CSSProperties = {
   padding: "20px",
 };
 
+
 const titleStyle: React.CSSProperties = {
   fontSize: "28px",
   marginBottom: "20px",
   color: "#333",
 };
 
+
 const optionsContainerStyle: React.CSSProperties = {
-  display: "flex",
+  display: "inline-flex",
   gap: "20px",
   marginBottom: "20px",
 };
+
 
 const buttonStyle: React.CSSProperties = {
   padding: "10px 20px",
@@ -486,6 +522,7 @@ const buttonStyle: React.CSSProperties = {
   cursor: "pointer",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
 };
+
 
 const modalOverlayStyle: React.CSSProperties = {
   position: "fixed",
@@ -500,6 +537,7 @@ const modalOverlayStyle: React.CSSProperties = {
   zIndex: 1000,
 };
 
+
 const modalStyle: React.CSSProperties = {
   backgroundColor: "#FFF",
   padding: "20px",
@@ -509,12 +547,14 @@ const modalStyle: React.CSSProperties = {
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
 };
 
+
 const modalTitleStyle: React.CSSProperties = {
   fontSize: "24px",
   marginBottom: "20px",
   color: "#333",
   textAlign: "center",
 };
+
 
 const modalButtonsStyle: React.CSSProperties = {
   display: "flex",
@@ -523,16 +563,19 @@ const modalButtonsStyle: React.CSSProperties = {
   marginTop: "15px",
 };
 
+
 const buttonHoverStyle: React.CSSProperties = {
   ...buttonStyle,
   backgroundColor: "#FF5F1F", // Lighter shade for hover
   transform: "scale(1.05)", // Slightly increase size on hover
 };
 
+
 const closeButtonHoverStyle: React.CSSProperties = {
   backgroundColor: "rgb(85, 99, 104)",
   transform: "scale(1.05)",
 };
+
 
 const textareaStyle: React.CSSProperties = {
   width: "100%",
@@ -544,6 +587,7 @@ const textareaStyle: React.CSSProperties = {
   resize: "vertical",
 };
 
+
 const errorStyle: React.CSSProperties = {
   color: "red",
   marginTop: "10px",
@@ -553,6 +597,7 @@ const errorStyle: React.CSSProperties = {
   backgroundColor: "#ffebee",
   borderRadius: "4px",
 };
+
 
 const closeButtonStyle: React.CSSProperties = {
   padding: "10px 20px",
@@ -564,10 +609,12 @@ const closeButtonStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
+
 const saveButtonHoverStyle: React.CSSProperties = {
   backgroundColor: "#45A049", // Lighter green shade for hover
   transform: "scale(1.05)", // Slightly increase size on hover
 };
+
 
 const resultStyle: React.CSSProperties = {
   width: "80%",
@@ -579,12 +626,14 @@ const resultStyle: React.CSSProperties = {
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 };
 
+
 const saveFormStyle: React.CSSProperties = {
   marginBottom: "20px",
   display: "flex",
   gap: "10px",
   width: "100%",
 };
+
 
 const titleInputStyle: React.CSSProperties = {
   flex: 1,
@@ -593,6 +642,7 @@ const titleInputStyle: React.CSSProperties = {
   borderRadius: "5px",
   border: "1px solid #D3CBC2",
 };
+
 
 const saveButtonStyle: React.CSSProperties = {
   padding: "10px 20px",
@@ -604,16 +654,19 @@ const saveButtonStyle: React.CSSProperties = {
   fontSize: "16px",
 };
 
+
 const blogContentStyle: React.CSSProperties = {
   lineHeight: "1.6",
   color: "#333",
 };
+
 
 const paragraphStyle: React.CSSProperties = {
   marginBottom: "16px",
   fontSize: "16px",
   lineHeight: "1.6",
 };
+
 
 const imageContainerStyle: React.CSSProperties = {
   width: "100%",
@@ -622,6 +675,7 @@ const imageContainerStyle: React.CSSProperties = {
   marginTop: "20px",
 };
 
+
 const generatedImageStyle: React.CSSProperties = {
   maxWidth: "100%",
   height: "auto",
@@ -629,4 +683,17 @@ const generatedImageStyle: React.CSSProperties = {
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 };
 
+const containerBoxStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  padding: "30px",
+  borderRadius: "15px",
+  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.1)",
+  width: "100%",
+  maxWidth: "500px",
+  textAlign: "center",
+  marginTop: "20px",
+};
+
+
 export default MainSection;
+
