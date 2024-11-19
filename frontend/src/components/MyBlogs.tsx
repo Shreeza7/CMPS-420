@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
+// MyBlogs.tsx or MyBlogs.js
+
 interface BlogPost {
   id: string;
   title: string;
   content: string;
+  type: 'text' | 'image';
   date: string;
 }
 
-const MyBlogs: React.FC = () => {
+const MyBlogs = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
 
@@ -25,50 +28,89 @@ const MyBlogs: React.FC = () => {
     }
   };
 
+  const renderContent = (blog: BlogPost) => {
+    if (blog.type === 'image') {
+      return (
+        <div style={imageContainerStyle}>
+          <img 
+            src={blog.content} 
+            alt={blog.title} 
+            style={previewImageStyle}
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      );
+    }
+    return (
+      <div style={previewContentStyle}>
+        {blog.content.split('\n').map((paragraph, index) => (
+          <p key={index} style={paragraphStyle}>{paragraph}</p>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div style={containerStyle}>
-      <h2 style={titleStyle}>My Saved Blogs</h2>
+      <h2 style={titleStyle}>My Saved Content</h2>
       <div style={contentContainerStyle}>
         <div style={listStyle}>
           {blogs.map(blog => (
             <div key={blog.id} style={blogItemStyle}>
-              <h3 
-                style={blogTitleStyle}
-                onClick={() => setSelectedBlog(blog)}
-              >
+              <h3 style={blogTitleStyle} onClick={() => setSelectedBlog(blog)}>
                 {blog.title}
+                <span style={contentTypeStyle}>
+                  {blog.type === 'image' ? ' 🖼️' : ' 📝'}
+                </span>
               </h3>
               <div style={blogMetaStyle}>
                 <span>{new Date(blog.date).toLocaleDateString()}</span>
-                <button 
-                  onClick={() => deleteBlog(blog.id)}
-                  style={deleteButtonStyle}
-                >
+                <button onClick={() => deleteBlog(blog.id)} style={deleteButtonStyle}>
                   Delete
                 </button>
               </div>
             </div>
           ))}
           {blogs.length === 0 && (
-            <p style={emptyMessageStyle}>No saved blogs yet. Generate some content to get started!</p>
+            <p style={emptyMessageStyle}>No saved content yet. Generate some content to get started!</p>
           )}
         </div>
+        
         {selectedBlog && (
           <div style={previewStyle}>
             <h2 style={previewTitleStyle}>{selectedBlog.title}</h2>
-            <div style={previewContentStyle}>
-              {selectedBlog.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} style={paragraphStyle}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            {renderContent(selectedBlog)}
           </div>
         )}
       </div>
     </div>
   );
 };
+
+// Add these new styles
+const imageContainerStyle = {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: '20px',
+};
+
+const previewImageStyle = {
+  maxWidth: '100%',
+  height: 'auto',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+};
+
+const contentTypeStyle = {
+  fontSize: '0.8em',
+  marginLeft: '8px',
+};
+
+// ... rest of your existing styles
+
+
 
 const containerStyle: React.CSSProperties = {
   padding: '20px',
