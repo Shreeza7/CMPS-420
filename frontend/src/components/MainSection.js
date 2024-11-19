@@ -385,7 +385,6 @@ const modalTitleStyle = {
 const textareaStyle = {
   width: "100%",
   height: "150px",
-  padding: "10px",
   borderRadius: "5px",
   border: "1px solid #D3CBC2",
   marginBottom: "15px",
