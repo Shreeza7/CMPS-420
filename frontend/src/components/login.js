@@ -1,14 +1,45 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock } from 'lucide-react';
+import {useState} from 'react';
+import { Link,useNavigate } from 'react-router-dom';
+import { Mail} from 'lucide-react';
+import { toast } from 'react-toastify';
 
-const LoginPage = () => {
+const LoginPage = ({ setAuthStatus }) => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+ const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success('Login successful!');
+        localStorage.setItem('authToken', result.token); 
+        setAuthStatus(true);
+        setEmail(''); 
+        setPassword(''); 
+        navigate('/'); 
+      } else {
+        toast.error(result.error || 'Login failed.');
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.');
+      console.error('Error:', error);
+    }
+  };
   return (
     <div style={styles.container}>
       <main style={styles.main}>
         <div style={styles.formContainer}>
           <h2 style={styles.formTitle}>Login</h2>
-          
           <div style={styles.formFields}>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Email</label>
@@ -16,6 +47,8 @@ const LoginPage = () => {
                 type="email" 
                 style={styles.input}
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Mail style={styles.inputIcon} size={20} /> 
             </div>
@@ -26,11 +59,12 @@ const LoginPage = () => {
                 type="password" 
                 style={styles.input}
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <Lock style={styles.inputIcon} size={20} /> 
             </div>
 
-            <button style={styles.button}>
+            <button style={styles.button}onClick={handleLogin}>
               Login
             </button>
             

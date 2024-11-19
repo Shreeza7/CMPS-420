@@ -1,17 +1,40 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock } from 'lucide-react';
+import { Link,useNavigate } from 'react-router-dom';
+import { Mail} from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    try {
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success('Signup successful!');
+        setFormData({ fullName: '', email: '', password: '' });
+        navigate('/');
+      } else {
+        toast.error(result.error || 'Signup failed.');
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.');
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -19,7 +42,6 @@ const SignUpPage = () => {
       <main style={styles.main}>
         <div style={styles.formContainer}>
           <h2 style={styles.formTitle}>Sign Up</h2>
-          
           <form onSubmit={handleSubmit} style={styles.formFields}>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Full Name</label>
@@ -53,7 +75,6 @@ const SignUpPage = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
               />
-              <Lock style={styles.inputIcon} size={20} />
             </div>
 
             <button style={styles.button}>Sign Up</button>
