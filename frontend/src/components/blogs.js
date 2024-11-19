@@ -3,11 +3,8 @@ import React, { useState, useEffect } from "react";
 const BlogPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isMinimized, setIsMinimized] = useState(false);
-
 
   useEffect(() => {
-    // Fetching blog posts from local storage or an API
     const savedBlogs = JSON.parse(localStorage.getItem("blogPosts") || "[]");
     setBlogPosts(savedBlogs);
   }, []);
@@ -19,10 +16,37 @@ const BlogPage = () => {
   const closeModal = () => {
     setSelectedPost(null);
   };
-  const minimizeModal = () => {
-    setIsMinimized(!isMinimized);
+
+  const isBase64Image = (str) => {
+    return str && (
+      str.startsWith('data:image/jpeg;base64,') || 
+      str.startsWith('data:image/png;base64,')
+    );
   };
-  
+
+  const renderContent = (content, type) => {
+    if (type === 'image' || isBase64Image(content)) {
+      const imageUrl = content.startsWith('data:') ? content : `data:image/jpeg;base64,${content}`;
+      return (
+        <img 
+          src={imageUrl} 
+          alt="Blog content"
+          style={{
+            maxWidth: '100%',
+            height: 'auto',
+            borderRadius: '8px',
+            display: 'block',
+            margin: '0 auto'
+          }}
+        />
+      );
+    }
+    return content.split("\n").map((paragraph, index) => (
+      <p key={index} style={postExcerptStyle}>
+        {paragraph}
+      </p>
+    ));
+  };
 
   return (
     <div style={pageStyle}>
@@ -31,14 +55,29 @@ const BlogPage = () => {
         {blogPosts.length > 0 ? (
           blogPosts.map((post) => (
             <div key={post.id} style={blogPostStyle}>
-              <h2 style={postTitleStyle}>{post.title}</h2>
-              <p style={postExcerptStyle}>
-                {post.content.length > 100
-                  ? `${post.content.substring(0, 100)}...`
-                  : post.content}
-              </p>
+              <h2 style={postTitleStyle}>
+                {post.title}
+                <span style={contentTypeStyle}>
+                  {(post.type === 'image' || isBase64Image(post.content)) ? ' 🖼️' : ' 📝'}
+                </span>
+              </h2>
+              <div style={postContentStyle}>
+                {(post.type === 'image' || isBase64Image(post.content)) ? (
+                  <img 
+                    src={post.content.startsWith('data:') ? post.content : `data:image/jpeg;base64,${post.content}`}
+                    alt={post.title}
+                    style={thumbnailStyle}
+                  />
+                ) : (
+                  <p style={postExcerptStyle}>
+                    {post.content.length > 100
+                      ? `${post.content.substring(0, 100)}...`
+                      : post.content}
+                  </p>
+                )}
+              </div>
               <button onClick={() => openModal(post)} style={readMoreStyle}>
-                Read More
+                {(post.type === 'image' || isBase64Image(post.content)) ? 'View Full Image' : 'Read More'}
               </button>
             </div>
           ))
@@ -51,7 +90,7 @@ const BlogPage = () => {
         <div style={modalOverlayStyle} onClick={closeModal}>
           <div
             style={modalContentStyle}
-            onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside the modal
+            onClick={(e) => e.stopPropagation()}
           >
             <button onClick={closeModal} style={closeButtonStyle}>
               ×
@@ -59,9 +98,7 @@ const BlogPage = () => {
             
             <h2 style={modalTitleStyle}>{selectedPost.title}</h2>
             <div style={modalBodyStyle}>
-              {selectedPost.content.split("\n").map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              {renderContent(selectedPost.content, selectedPost.type)}
             </div>
           </div>
         </div>
@@ -70,7 +107,7 @@ const BlogPage = () => {
   );
 };
 
-// Styles
+// Styles remain the same as before
 const pageStyle = {
   padding: "20px",
   color: "#333",
@@ -98,6 +135,24 @@ const blogPostStyle = {
 const postTitleStyle = {
   fontSize: "24px",
   marginBottom: "10px",
+  display: "flex",
+  alignItems: "center",
+};
+
+const contentTypeStyle = {
+  fontSize: "0.8em",
+  marginLeft: "8px",
+};
+
+const postContentStyle = {
+  marginBottom: "15px",
+};
+
+const thumbnailStyle = {
+  maxWidth: "200px",
+  maxHeight: "150px",
+  objectFit: "cover",
+  borderRadius: "4px",
 };
 
 const postExcerptStyle = {
@@ -141,9 +196,9 @@ const modalContentStyle = {
   padding: "20px",
   borderRadius: "10px",
   width: "80%",
-  maxWidth: "600px",
-  maxHeight: "80vh", // Sets the maximum height
-  overflowY: "auto", // Adds vertical scroll if content overflows
+  maxWidth: "800px",
+  maxHeight: "80vh",
+  overflowY: "auto",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   position: "relative",
 };
