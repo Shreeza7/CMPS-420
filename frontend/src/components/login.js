@@ -1,71 +1,126 @@
-import {useState} from 'react';
-import { Link,useNavigate } from 'react-router-dom';
-import { Mail} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const LoginPage = ({ setAuthStatus }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
- const handleLogin = async () => {
+  // Handles saving any pending blog content after successful login
+  const handlePendingBlog = () => {
+    try {
+      const pendingBlog = sessionStorage.getItem('pendingBlog');
+      if (pendingBlog) {
+        const blogData = JSON.parse(pendingBlog);
+        const existingPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
+        
+        // Create new post with unique ID
+        const newPost = {
+          ...blogData,
+          id: Date.now().toString()
+        };
+        
+        localStorage.setItem("blogPosts", JSON.stringify([...existingPosts, newPost]));
+        sessionStorage.removeItem('pendingBlog');
+        toast.success('Your blog post has been saved!');
+        navigate('/myblogs');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error handling pending blog:", error);
+      return false;
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password })
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
       if (response.ok) {
-        toast.success('Login successful!');
-        localStorage.setItem('authToken', result.token); 
+        localStorage.setItem('authToken', data.token);
         setAuthStatus(true);
-        setEmail(''); 
-        setPassword(''); 
-        navigate('/'); 
+        toast.success('Login successful!');
+        
+        // Check for pending blog and handle accordingly
+        const hasPendingBlog = handlePendingBlog();
+        if (!hasPendingBlog) {
+          navigate('/');
+        }
       } else {
-        toast.error(result.error || 'Login failed.');
+        toast.error(data.message || 'Invalid credentials');
       }
     } catch (error) {
-      toast.error('Network error. Please try again.');
-      console.error('Error:', error);
+      console.error('Login error:', error);
+      toast.error('Network error. Please check if the server is running.');
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <div style={styles.container}>
       <main style={styles.main}>
         <div style={styles.formContainer}>
           <h2 style={styles.formTitle}>Login</h2>
-          <div style={styles.formFields}>
+          <form onSubmit={handleLogin} style={styles.formFields}>
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Email</label>
+              <label htmlFor="email" style={styles.label}>Email</label>
               <input 
+                id="email"
                 type="email" 
                 style={styles.input}
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
-              <Mail style={styles.inputIcon} size={20} /> 
+              <Mail style={styles.inputIcon} size={20} />
             </div>
             
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Password</label>
+              <label htmlFor="password" style={styles.label}>Password</label>
               <input 
+                id="password"
                 type="password" 
                 style={styles.input}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
-            <button style={styles.button}onClick={handleLogin}>
-              Login
+            <button 
+              type="submit" 
+              style={{
+                ...styles.button,
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? 'not-allowed' : 'pointer'
+              }}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
             
             <div style={styles.links}>
@@ -73,16 +128,17 @@ const LoginPage = ({ setAuthStatus }) => {
                 Don't have an account? <Link to="/signup" style={styles.link}>Sign up</Link>
               </p>
               <p style={styles.linkText}>
-                <a href="#" style={styles.link}>Forgot your password?</a>
+                <Link to="/forgot-password" style={styles.link}>Forgot your password?</Link>
               </p>
             </div>
-          </div>
+          </form>
         </div>
       </main>
     </div>
   );
 };
 
+// Styles object
 const styles = {
   container: {
     minHeight: '80vh',
@@ -128,6 +184,7 @@ const styles = {
     fontSize: '0.875rem',
     fontWeight: '500',
     color: '#4B5563',
+    alignSelf: 'flex-start',
   },
   input: {
     width: '100%',
@@ -137,37 +194,33 @@ const styles = {
     fontSize: '1rem',
     outline: 'none',
     transition: 'border-color 0.2s',
-    ':focus': {
-      borderColor: '#F28A2E',
-    },
   },
   inputIcon: {
     position: 'absolute',
-    right: '0rem',
+    right: '0.75rem',
     top: '65%',
     transform: 'translateY(-50%)',
-    color: '#8b7355', 
+    color: '#8b7355',
     pointerEvents: 'none',
   },
   button: {
     width: '100%',
     backgroundColor: '#F28A2E',
     color: 'white',
-    padding: '0.5rem 1rem',
+    padding: '0.75rem 1rem',
     borderRadius: '0.375rem',
     border: 'none',
     fontSize: '1rem',
     cursor: 'pointer',
     transition: 'background-color 0.2s',
-    ':hover': {
-      backgroundColor: '#E07A1E',
-    },
+    marginTop: '1rem',
   },
   links: {
     textAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     gap: '0.5rem',
+    marginTop: '1rem',
   },
   linkText: {
     fontSize: '0.875rem',
@@ -177,9 +230,7 @@ const styles = {
   link: {
     color: '#F28A2E',
     textDecoration: 'none',
-    ':hover': {
-      textDecoration: 'underline',
-    },
+    transition: 'color 0.2s',
   },
 };
 
