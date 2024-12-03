@@ -1,8 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { generateBlogText } from "../services/textGenerationService";
 import { generateImage } from "../services/imageGenerationService";
+import { toast } from 'react-toastify';
 
 const MainSection = () => {
+  // Navigation hook for redirecting users
+  const navigate = useNavigate();
+
+  // State management for form inputs and UI controls
   const [userInput, setUserInput] = useState("");
   const [blogContent, setBlogContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -14,44 +20,61 @@ const MainSection = () => {
   const [imagePrompt, setImagePrompt] = useState("");
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
   const [isImageLoading, setIsImageLoading] = useState(false);
+  const [hoveredSaveButton, setHoveredSaveButton] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [hoveredGenerateButton, setHoveredGenerateButton] = useState(false);
   const [hoveredCloseButton, setHoveredCloseButton] = useState(false);
   const [hoveredGenerateImageButton, setHoveredGenerateImageButton] = useState(false);
   const [hoveredCloseImageButton, setHoveredCloseImageButton] = useState(false);
-  const [hoveredSaveButton, setHoveredSaveButton] = useState(false);
 
+  // Handles opening the text generation modal
   const openTextModal = () => {
     setTextModalOpen(true);
     setBlogContent("");
     setShowSaveForm(false);
     setUserInput("");
     setError("");
-    setGeneratedImageUrl(""); // Clear any existing image
+    setGeneratedImageUrl("");
   };
 
+  // Handles closing the text generation modal
   const closeTextModal = () => {
     setTextModalOpen(false);
     setError("");
   };
 
+  // Handles opening the image generation modal
   const openImageModal = () => {
     setImageModalOpen(true);
     setImagePrompt("");
     setGeneratedImageUrl("");
     setError("");
-    setBlogContent(""); // Clear any existing blog content
+    setBlogContent("");
     setShowSaveForm(false);
   };
 
+  // Handles closing the image generation modal
   const closeImageModal = () => {
     setImageModalOpen(false);
     setError("");
   };
 
+  // Stores the current blog content before redirecting to login
+  const storePendingBlog = () => {
+    const pendingBlog = {
+      title: blogTitle,
+      content: generatedImageUrl || blogContent,
+      type: generatedImageUrl ? 'image' : 'text',
+      date: new Date().toISOString()
+    };
+    // Use sessionStorage to persist data during redirect but clear on tab close
+    sessionStorage.setItem('pendingBlog', JSON.stringify(pendingBlog));
+  };
+
+  // Handles the generation of blog text content
   const handleGenerateBlogContent = async () => {
     if (!userInput.trim()) {
-      alert("Please enter some text first!");
+      toast.error("Please enter some text first!");
       return;
     }
 
@@ -59,23 +82,28 @@ const MainSection = () => {
     setError("");
     setGeneratedImageUrl("");
 
-    const result = await generateBlogText(userInput);
-    
-    if (result.error) {
-      setError(result.error);
-      setBlogContent("");
-    } else {
-      setBlogContent(result.blogContent);
-      setShowSaveForm(true);
-      setTextModalOpen(false);
+    try {
+      const result = await generateBlogText(userInput);
+      
+      if (result.error) {
+        setError(result.error);
+        setBlogContent("");
+      } else {
+        setBlogContent(result.blogContent);
+        setShowSaveForm(true);
+        setTextModalOpen(false);
+      }
+    } catch (error) {
+      setError("Failed to generate content. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
+  // Handles the generation of images
   const handleGenerateImage = async () => {
     if (!imagePrompt.trim()) {
-      alert("Please enter an image description first!");
+      toast.error("Please enter an image description first!");
       return;
     }
 
@@ -83,54 +111,70 @@ const MainSection = () => {
     setError("");
     setBlogContent("");
 
-    const result = await generateImage(imagePrompt);
-    
-    if (result.error) {
-      setError(result.error);
-    } else {
-      setGeneratedImageUrl(result.imageUrl);
-      setShowSaveForm(true);  // Show save form for images
-      setImageModalOpen(false);
+    try {
+      const result = await generateImage(imagePrompt);
+      
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setGeneratedImageUrl(result.imageUrl);
+        setShowSaveForm(true);
+        setImageModalOpen(false);
+      }
+    } catch (error) {
+      setError("Failed to generate image. Please try again.");
+    } finally {
+      setIsImageLoading(false);
     }
-    
-    setIsImageLoading(false);
   };
 
+  // Handles saving blog posts with authentication check
   const saveBlogPost = () => {
     if (!blogTitle.trim()) {
-      alert("Please enter a title");
+      toast.error("Please enter a title");
+      return;
+    }
+
+    // Check for authentication
+    const authToken = localStorage.getItem('authToken');
+    
+    if (!authToken) {
+      // Store current content and redirect to login
+      storePendingBlog();
+      toast.info('Please log in to save your blog post');
+      navigate('/login');
       return;
     }
 
     try {
+      // Create new blog post object
       const newPost = {
         id: Date.now().toString(),
         title: blogTitle,
         content: generatedImageUrl || blogContent,
-        type: generatedImageUrl ? 'image' : 'text', // Add type to differentiate
-        date: new Date().toISOString(),
+        type: generatedImageUrl ? 'image' : 'text',
+        date: new Date().toISOString()
       };
 
-      const existingPosts = JSON.parse(
-        localStorage.getItem("blogPosts") || "[]"
-      );
-      localStorage.setItem(
-        "blogPosts",
-        JSON.stringify([...existingPosts, newPost])
-      );
+      // Get and update existing posts
+      const existingPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
+      localStorage.setItem("blogPosts", JSON.stringify([...existingPosts, newPost]));
 
-      // Reset all states after saving
+      // Reset form state
       setBlogTitle("");
       setShowSaveForm(false);
       setBlogContent("");
       setGeneratedImageUrl("");
-      alert("Content saved successfully!");
+      
+      toast.success('Blog post saved successfully!');
+      navigate('/myblogs');
     } catch (error) {
-      console.error("Error saving content:", error);
-      alert("Failed to save content. Please try again.");
+      console.error("Error saving blog post:", error);
+      toast.error("Failed to save blog post. Please try again.");
     }
   };
 
+  // Component rendering
   return (
     <main style={mainStyle}>
       <div style={containerBoxStyle}>
@@ -240,7 +284,7 @@ const MainSection = () => {
         </div>
       )}
 
-      {/* Display generated content and save form */}
+      {/* Generated Content Display and Save Form */}
       {(blogContent || generatedImageUrl) && (
         <div style={resultStyle}>
           <div style={saveFormStyle}>
@@ -264,6 +308,7 @@ const MainSection = () => {
             </button>
           </div>
 
+          {/* Display Text Content */}
           {blogContent && (
             <div style={blogContentStyle}>
               {blogContent.split("\n").map((paragraph, index) => (
@@ -274,25 +319,15 @@ const MainSection = () => {
             </div>
           )}
           
+          {/* Display Generated Image */}
           {generatedImageUrl && (
             <div style={imageContainerStyle}>
-              {isImageLoading && <div>Loading image...</div>}
               <img
                 src={generatedImageUrl}
                 alt="Generated content"
                 style={generatedImageStyle}
                 crossOrigin="anonymous"
                 referrerPolicy="no-referrer"
-                onError={(e) => {
-                  console.error("Image loading error:", e);
-                  const target = e.target;
-                  if (!target.dataset.retried && target.src.includes("imgproxy")) {
-                    target.dataset.retried = "true";
-                    target.src = target.src.replace("imgproxy/", "");
-                  } else {
-                    setError("Error loading the generated image. Please try again.");
-                  }
-                }}
               />
             </div>
           )}
